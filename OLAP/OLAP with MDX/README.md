@@ -3,7 +3,7 @@
 **Author:** <br>
 Anika Neela<br>
 
-**Project Description**<br>
+**Project Description:**<br>
 Solving OLAP queries using MDX.
 
 **#Prerequisites:**<br>
