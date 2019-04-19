@@ -1,0 +1,144 @@
+//1)	Aggregates by combinations of supplier name and product name?
+
+  SELECT NON EMPTY { Measures.[Quantity - Tb Transactions], <br>
+		[Measures].[Tb Transactions Count],<br>
+		Measures.[Price - Tb Transactions] } ON COLUMNS,<br>
+	NON EMPTY {<br>
+		[Tb Supplier].[Name].[Name].ALLMEMBERS*<br>
+		[Tb Product].[Name].[Name].ALLMEMBERS} ON ROWS <br>
+ FROM DS715<br>
+
+//2)	Aggregates by supplier states?
+
+SELECT NON EMPTY { Measures.[Quantity - Tb Transactions], <br>
+	[Measures].[Tb Transactions Count],<br>
+	Measures.[Price - Tb Transactions] } ON COLUMNS,<br>
+NON EMPTY {<br>
+	[Tb Supplier].[State].[State].ALLMEMBERS} ON ROWS <br>
+FROM DS715<br>
+
+//3)	Number of transactions between supplier-city-consumer-city pairs?
+
+SELECT NON EMPTY {[Measures].[Tb Transactions Count]} ON COLUMNS,<br>
+NON EMPTY {<br>
+	[Tb Supplier].[City].[City].ALLMEMBERS*<br>
+	[Tb Consumer].[City].[City].ALLMEMBERS} ON ROWS <br>
+FROM DS715<br>
+
+//4)	Name of each product sold in Wisconsin and quantity of sales for the product?
+
+SELECT NON EMPTY ({[Measures].[Quantity - Tb Transactions]}, <br>
+					[Tb Consumer].[State].Wisconsin) ON COLUMNS,<br>
+NON EMPTY {<br>
+	[Tb Product].[Name].[Name].ALLMEMBERS} ON ROWS <br>
+FROM DS715<br>
+
+//5)	Quantity of sales aggregated by product and supplier state?
+
+SELECT NON EMPTY {[Measures].[Quantity - Tb Transactions]} ON COLUMNS,<br>
+NON EMPTY {<br>
+	[Tb Supplier].[State].[State].ALLMEMBERS*<br>
+	[Tb Product].[Name].[Name].ALLMEMBERS} ON ROWS <br>
+FROM DS715<br>
+
+//6)	Quantity of computer sales aggregated by suppliers in Wisconsin?
+
+SELECT NON EMPTY ({[Measures].[Quantity - Tb Transactions]},[Tb Supplier].[State].[State].Wisconsin) ON COLUMNS,<br>
+NON EMPTY {[Tb Product].[Name].Computer} ON ROWS <br>
+FROM DS715<br>
+
+//7)	Quantity of auto sales by each supplier from Wisconsin to consumers in Illinois?
+
+SELECT NON EMPTY ({[Measures].[Quantity - Tb Transactions]},[Tb Product].[Name].Auto) ON COLUMNS,<br>
+NON EMPTY {<br>
+	[Tb Supplier].[Name].[Name].ALLMEMBERS} ON ROWS <br>
+FROM DS715<br>
+WHERE ([Tb Supplier].[State].Wisconsin,[Tb Consumer].[State].Illinois)<br>
+
+//8)	Quantity of auto sales by each supplier in Madison to consumers in Illinois?
+
+SELECT NON EMPTY ({[Measures].[Quantity - Tb Transactions]},[Tb Product].[Name].Auto) ON COLUMNS,<br>
+NON EMPTY {<br>
+	[Tb Supplier].[Name].[Name].ALLMEMBERS} ON ROWS <br>
+FROM DS715<br>
+WHERE ([Tb Supplier].[City].Madison,[Tb Consumer].[State].Illinois)<br>
+
+//9)	Quantity of each product sold by supplier Bernstein to consumers in Chicago?
+
+SELECT NON EMPTY {[Measures].[Quantity - Tb Transactions]} ON COLUMNS,<br>
+NON EMPTY {[Tb Product].[Name].[Name].ALLMEMBERS} ON ROWS <br>
+FROM DS715<br>
+WHERE (	[Tb Supplier].[Name].Bernstein,[Tb Consumer].[City].Chicago)<br>
+
+//10)	Quantity of milk sold by supplier Bernstein to consumers in Chicago?
+
+SELECT NON EMPTY {[Measures].[Quantity - Tb Transactions]} ON COLUMNS,<br>
+NON EMPTY {[Tb Product].[Name].[Name].Milk} ON ROWS <br>
+FROM DS715<br>
+WHERE (	[Tb Supplier].[Name].Bernstein,[Tb Consumer].[City].Chicago)<br>
+
+--11. Quantity of sales aggregated by product category and supplier state?
+
+ SELECT NON EMPTY { <br>
+		[Measures].[Quantity - Tb Transactions] } ON COLUMNS,<br>
+	NON EMPTY (<br>
+		[Tb Supplier].[State].[State].ALLMEMBERS,<br>
+		[Tb Product].[Product Category].[Product Category].ALLMEMBERS) ON ROWS <br>
+ FROM DS715;<br>
+	
+--12. Number of transactions for every supplier-consumer-product combination?
+
+SELECT NON EMPTY { <br>
+		[Measures].[Tb Transactions Count]} ON COLUMNS,<br>
+	NON EMPTY (<br>
+		[Tb Supplier].[Name].[Name].ALLMEMBERS,<br>
+		[Tb Consumer].[Name].[Name].ALLMEMBERS, <br>
+		[Tb Product].[Name].[Name].ALLMEMBERS) ON ROWS  <br>
+ FROM DS715;<br>
+
+
+--13. Quantity of milk sales by each supplier from Illinois (rows) to each milk consumer in Wisconsin (columns)?
+
+ SELECT NON EMPTY([Measures].[Quantity - Tb Transactions],[Tb Supplier].[Name].[Name].ALLMEMBERS) ON ROWS,<br>
+		NON EMPTY([Tb Consumer].[Name].[Name].ALLMEMBERS) ON COLUMNS<br>
+		FROM DS715<br>
+		WHERE ([Tb Product].[Name].Milk,[Tb Consumer].[State].Wisconsin, [Tb Supplier].[State].Illinois);<br>
+	
+
+--14. Quantity of sales by each supplier from Madison to each consumer in Illinois (columns)?
+
+ SELECT NON EMPTY([Measures].[Quantity - Tb Transactions],[Tb Consumer].[Name].[Name].ALLMEMBERS) ON ROWS,<br>
+		NON EMPTY([Tb Supplier].[Name].[Name].ALLMEMBERS) ON COLUMNS<br>
+		FROM DS715<br>
+		WHERE ([Tb Consumer].[State].Illinois, [Tb Supplier].[City].Madison);<br>
+
+
+--15. For each consumer city list comparatively the quantity of products sold versus quantity of products requested (zero where null).
+
+SELECT NON EMPTY  [Tb Consumer].[City].[City].ALLMEMBERS <br>
+ 	 ON ROWS,<br>
+	NON EMPTY {[Quantity - Tb Transactions],[Quantity - Tb Requests]} ON COLUMNS<br>
+FROM [DS715];<br>
+
+--16. For each supplier city list comparatively the quantity of product sold for Airplane, Auto and Boat (cities on rows, products on columns).
+
+SELECT NON EMPTY ([Measures].[Quantity - Tb Transactions],[Tb Supplier].[City].[City].ALLMEMBERS) ON ROWS,<br>
+		NON EMPTY {[Tb Product].[Name].Airplane,[Tb Product].[Name].Auto,[Tb Product].[Name].Boat} ON COLUMNS<br>
+		FROM [DS715]<br>
+  	
+--17. Quantity of products sold by combinations of suppliers and by product lines in electronics? 
+
+SELECT NON EMPTY ([Measures].[Quantity - Tb Transactions], [Tb Supplier].[Name].[Name].ALLMEMBERS) ON ROWS,<br>
+		NON EMPTY([Tb Product].[Hierarchy].[Product Line].ALLMEMBERS) ON COLUMNS<br>
+		FROM DS715<br>
+		WHERE [Tb Product].[Product Category].Electronics<br>
+
+
+--18. For each supplier city list quantity of transactions for category transportation and each product line in transportations (zero where null and total over all cities on each column)? 
+
+WITH MEMBER Transactions_Quantity AS COALESCEEMPTY([Measures].[Quantity - Tb Transactions],0)<br>
+SELECT NON EMPTY(Transactions_Quantity,[Tb Supplier].[City].ALLMEMBERS) ON ROWS,<br>
+	NON EMPTY([Tb Product].[Hierarchy].[Product Line].ALLMEMBERS) ON COLUMNS<br>
+	FROM DS715<br>
+	WHERE [Tb Product].[Product Category].Transportation
+
